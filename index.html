@@ -7,39 +7,44 @@
 <meta name="description" content="A simple, responsive Java calculator for everyday arithmetic.">
 <title>Java Calculator</title>
 <style>
-:root{color-scheme:light;--bg:#dedede;--panel:#f4f4f4;--screen:#d3d3d3;--key:#efefef;--text:#111;--muted:#555;--border:#888;--blue:#2457a7}
+:root{color-scheme:light;--page:#ddd;--frame:#f3f3f3;--screen:#bfbfbf;--text:#202020;--line:#9a9a9a}
 *{box-sizing:border-box}
-body{margin:0;min-height:100svh;display:grid;place-items:center;padding:18px;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-.app{width:min(460px,calc(100vw - 24px))}
-.calculator{width:100%;height:500px;padding:10px 20px 50px;background:var(--panel);border:1px solid #8c8c8c;box-shadow:0 3px 12px #0002}
-.display{height:80px;margin-bottom:10px;padding:8px 10px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;overflow:hidden;border:1px solid #aaa;background:var(--screen)}
-.expression{width:100%;min-height:16px;color:#555;font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.output{width:100%;margin-top:1px;color:#111;font-variant-numeric:tabular-nums;font-size:40px;font-weight:700;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip}
-.keys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(4,80px);gap:10px 4px}
-button{min-width:0;height:80px;border:1px solid #999;border-radius:2px;background:var(--key);color:#111;font:700 46px/1 Arial,Helvetica,sans-serif;cursor:pointer;box-shadow:inset 0 1px #fff;touch-action:manipulation}
-button:hover{background:#e4e4e4;border-color:#777}
-button:active{background:#d7d7d7;box-shadow:inset 0 2px 4px #0003}
-button:focus-visible{outline:3px solid #2457a7;outline-offset:1px}
-button.utility{grid-column:span 2;font-size:16px}
-button.operator{font-size:31px}
-button.equals{grid-column:span 3;background:#e5e5e5;font-size:31px}
-button.equals:hover{background:#d9e4f4}
-.hint{margin:11px 0 0;color:#555;font-size:12px;text-align:center}
-@media(max-width:480px){body{padding:12px}.calculator{height:min(500px,calc(100svh - 62px));min-height:410px;padding:10px 12px 34px}.keys{grid-template-rows:repeat(4,minmax(58px,1fr));gap:8px 4px;height:calc(100% - 90px)}button{height:100%;font-size:clamp(30px,10vw,46px)}button.utility{font-size:15px}.output{font-size:clamp(34px,10vw,40px)}}
+body{margin:0;min-height:100svh;display:grid;place-items:center;padding:14px;background:var(--page);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.app{width:min(576px,calc(100vw - 20px))}
+.window{width:100%;height:min(630px,calc(100svh - 20px));min-height:470px;display:flex;flex-direction:column;overflow:hidden;border:1px solid #aaa;border-radius:16px 16px 3px 3px;background:var(--frame);box-shadow:0 4px 18px #0003}
+.titlebar{height:50px;flex:0 0 50px;display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid #d0d0d0;background:linear-gradient(#fafafa,#e9e9e9);font-size:17px;font-weight:700}
+.window-controls{position:absolute;right:9px;top:50%;display:flex;gap:8px;transform:translateY(-50%);color:#666;font-size:14px}
+.window-controls span{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#e1e1e1}
+.display{height:100px;flex:0 0 100px;margin:12px 4.2% 0;padding:8px 12px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;overflow:hidden;background:var(--screen);border:1px solid #b4b4b4}
+.expression{width:100%;min-height:18px;color:#484848;font-size:13px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.output{width:100%;margin-top:0;color:#111;font-variant-numeric:tabular-nums;font-size:clamp(38px,11vw,64px);font-weight:700;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.keys{flex:1;min-height:0;display:grid;grid-template-columns:20.15% 20.34% 20.15% 19.01% 15.59%;grid-template-rows:repeat(4,minmax(0,1fr));row-gap:12px;margin:12px 4.2% 16px}
+button{min-width:0;width:100%;height:100%;border:2px solid #91aabd;border-radius:1px;background:linear-gradient(#fff 0%,#f5f9fd 34%,#dceaf5 100%);color:#292929;font:700 clamp(38px,11vw,64px)/1 Arial,Helvetica,sans-serif;cursor:pointer;box-shadow:inset 0 1px #fff;touch-action:manipulation}
+button:hover{background:linear-gradient(#fff 0%,#edf5fb 34%,#cbdff0 100%)}
+button:active{background:linear-gradient(#cbdff0,#f5f9fd);box-shadow:inset 0 2px 5px #38516a55}
+button:focus-visible{outline:3px solid #235a91;outline-offset:2px}
+button.utility{grid-column:4 / 6;width:calc(100% + 3.23%);margin-left:17%;font-size:16px}
+button.operator{font-size:clamp(30px,7vw,46px)}
+button.operator:nth-of-type(8),button.operator:nth-of-type(13){grid-column:4;width:calc(100% + 17%);margin-left:17%}
+button.operator:nth-of-type(9),button.operator:nth-of-type(14){grid-column:5;width:calc(100% + 25%);margin-left:30.5%}
+button.equals{grid-column:3 / 6;width:calc(100% + 5.3%);margin-left:10.5%;font-size:clamp(30px,7vw,46px)}
+.hint{margin:9px 0 0;color:#555;font-size:12px;text-align:center}
+@media(max-width:600px){body{padding:10px}.window{height:min(630px,calc(100svh - 20px));min-height:450px}.display{height:clamp(70px,14vh,100px);flex-basis:clamp(70px,14vh,100px)}.keys{row-gap:clamp(7px,2vh,12px);margin-bottom:12px}button.utility{font-size:15px}.hint{font-size:11px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <main class="app">
-  <section class="calculator" aria-label="Calculator">
+  <section class="window" aria-label="Calculator window">
+    <div class="titlebar"><span>Calculator</span><div class="window-controls" aria-hidden="true"><span>−</span><span>□</span><span>×</span></div></div>
     <div class="display" role="status" aria-live="polite" aria-atomic="true">
       <div class="expression" id="expression"></div>
       <output class="output" id="output" aria-label="Display">0</output>
     </div>
     <div class="keys">
       <button data-digit="7">7</button><button data-digit="8">8</button><button data-digit="9">9</button><button class="utility" data-action="clear" aria-label="Clear">Clear</button>
-      <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button><button class="operator" data-op="+" aria-label="Add">+</button><button class="operator" data-op="*" aria-label="Multiply">×</button>
-      <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button><button class="operator" data-op="-" aria-label="Subtract">−</button><button class="operator" data-op="/" aria-label="Divide">÷</button>
+      <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button><button class="operator" data-op="+" aria-label="Add">+</button><button class="operator" data-op="*" aria-label="Multiply">X</button>
+      <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button><button class="operator" data-op="-" aria-label="Subtract">-</button><button class="operator" data-op="/" aria-label="Divide">÷</button>
       <button data-digit="0">0</button><button data-digit=".">.</button><button class="equals" data-action="equals" aria-label="Equals">=</button>
     </div>
   </section>
