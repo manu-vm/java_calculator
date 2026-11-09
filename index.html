@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101915">
+<meta name="description" content="A simple, responsive Java calculator for everyday arithmetic.">
+<title>Java Calculator</title>
+<style>
+:root{color-scheme:dark;--bg:#101915;--panel:#19251f;--screen:#121b17;--key:#26352d;--key-hover:#30443a;--accent:#b8f36b;--text:#f4f7f3;--muted:#94a59a;--border:#304137}
+*{box-sizing:border-box}
+body{margin:0;min-height:100svh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 10%,#26372c 0,transparent 45%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{width:min(100%,390px)}
+.brand{display:flex;align-items:center;gap:12px;margin:0 0 18px 3px}
+.brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:var(--accent);color:#1b2715;font-size:21px;font-weight:800}
+h1{font-size:17px;letter-spacing:.01em;margin:0}
+.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.calculator{padding:16px;background:color-mix(in srgb,var(--panel) 94%,transparent);border:1px solid var(--border);border-radius:26px;box-shadow:0 28px 80px #0006}
+.display{height:130px;margin-bottom:14px;padding:16px 18px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;overflow:hidden;border:1px solid #29392f;border-radius:18px;background:var(--screen)}
+.expression{width:100%;min-height:22px;color:var(--muted);font-size:14px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.output{width:100%;margin-top:7px;color:var(--text);font-variant-numeric:tabular-nums;font-size:clamp(34px,10vw,52px);font-weight:550;letter-spacing:-.045em;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+button{height:66px;border:1px solid transparent;border-radius:16px;background:var(--key);color:var(--text);font:600 21px/1 inherit;cursor:pointer;transition:background .14s,transform .08s,border-color .14s;touch-action:manipulation}
+button:hover{background:var(--key-hover);border-color:#405448}
+button:active{transform:scale(.96)}
+button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+button.utility{color:#d6e2d9;background:#304139;font-size:17px}
+button.operator{color:var(--accent);font-size:25px}
+button.equals{background:var(--accent);color:#1b2715;font-size:25px}
+button.equals:hover{background:#c8ff80}
+button.zero{grid-column:span 2;text-align:left;padding-left:26px}
+.hint{margin:15px 4px 0;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:420px){body{padding:18px}.calculator{padding:13px;border-radius:23px}.keys{gap:8px}button{height:clamp(58px,16vw,66px);border-radius:14px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="brand"><div class="brand-mark" aria-hidden="true">÷</div><div><h1>Java Calculator</h1><p>Simple calculations, wherever you are</p></div></header>
+  <section class="calculator" aria-label="Calculator">
+    <div class="display" role="status" aria-live="polite" aria-atomic="true">
+      <div class="expression" id="expression"></div>
+      <output class="output" id="output" aria-label="Display">0</output>
+    </div>
+    <div class="keys">
+      <button class="utility" data-action="clear" aria-label="All clear">AC</button>
+      <button class="utility" data-action="sign" aria-label="Change sign">+/−</button>
+      <button class="utility" data-action="percent" aria-label="Percent">%</button>
+      <button class="operator" data-op="/" aria-label="Divide">÷</button>
+      <button data-digit="7">7</button><button data-digit="8">8</button><button data-digit="9">9</button><button class="operator" data-op="*" aria-label="Multiply">×</button>
+      <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button><button class="operator" data-op="-" aria-label="Subtract">−</button>
+      <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button><button class="operator" data-op="+" aria-label="Add">+</button>
+      <button class="zero" data-digit="0">0</button><button data-digit=".">.</button><button class="equals" data-action="equals" aria-label="Equals">=</button>
+    </div>
+  </section>
+  <p class="hint">Use the buttons or your keyboard · Esc clears · Enter calculates</p>
+</main>
+<script>
+'use strict';
+const output=document.getElementById('output');
+const expression=document.getElementById('expression');
+let current='0',stored=null,operator=null,resetOnDigit=false,justCalculated=false;
+const symbols={'+':'+','-':'−','*':'×','/':'÷'};
+function clean(n){if(!Number.isFinite(n))return null;return Number.parseFloat(n.toPrecision(12)).toString()}
+function paint(){output.textContent=current;expression.textContent=expression.textContent}
+function inputDigit(d){
+ if(current==='Error'){clearAll()}
+ if(d==='.'&&current.includes('.')&&!resetOnDigit)return;
+ if(resetOnDigit){current=d==='.'?'0.':d;resetOnDigit=false}
+ else if(d==='.')current=current.includes('.')?current:current+'.';
+ else current=current==='0'?d:current+d;
+ if(current.replace(/[-.]/g,'').length>15)current=current.slice(0,-1);
+ justCalculated=false;paint()
+}
+function calculate(a,b,op){
+ if(op==='+')return a+b;if(op==='-')return a-b;if(op==='*')return a*b;if(op==='/')return b===0?null:a/b;return b
+}
+function chooseOperator(next){
+ if(current==='Error')return;
+ const value=Number(current);
+ if(operator&&stored!==null&&!resetOnDigit){const result=calculate(stored,value,operator);if(result===null){showError();return}current=clean(result);stored=Number(current)}
+ else stored=value;
+ operator=next;expression.textContent=clean(stored)+' '+symbols[next];resetOnDigit=true;justCalculated=false;paint()
+}
+function equals(){
+ if(operator===null||stored===null||current==='Error')return;
+ const left=stored,right=Number(current),op=operator,result=calculate(left,right,op);
+ if(result===null){showError();return}
+ expression.textContent=clean(left)+' '+symbols[op]+' '+clean(right)+' =';current=clean(result);stored=null;operator=null;resetOnDigit=true;justCalculated=true;paint()
+}
+function showError(){current='Error';expression.textContent='Cannot divide by zero';stored=null;operator=null;resetOnDigit=true;paint()}
+function clearAll(){current='0';stored=null;operator=null;resetOnDigit=false;justCalculated=false;expression.textContent='';paint()}
+function action(name){
+ if(name==='clear'){clearAll();return}
+ if(current==='Error')return;
+ if(name==='sign'){if(current!=='0')current=current.startsWith('-')?current.slice(1):'-'+current;paint()}
+ if(name==='percent'){current=clean(Number(current)/100)||'0';paint()}
+ if(name==='equals')equals()
+}
+document.querySelector('.keys').addEventListener('click',event=>{
+ const button=event.target.closest('button');if(!button)return;
+ if(button.dataset.digit!==undefined)inputDigit(button.dataset.digit);
+ else if(button.dataset.op)chooseOperator(button.dataset.op);
+ else if(button.dataset.action)action(button.dataset.action)
+});
+document.addEventListener('keydown',event=>{
+ if(/^[0-9.]$/.test(event.key)){inputDigit(event.key);event.preventDefault();return}
+ const op=event.key==='x'||event.key==='X'?'*':event.key;
+ if(['+','-','*','/'].includes(op)){chooseOperator(op);event.preventDefault();return}
+ if(event.key==='Enter'||event.key==='='){equals();event.preventDefault();return}
+ if(event.key==='Escape'){clearAll();return}
+ if(event.key==='Backspace'&&current!=='Error'){current=current.length<=1||current.length===2&&current.startsWith('-')?'0':current.slice(0,-1);paint();event.preventDefault()}
+});
+paint();
+</script>
+</body>
+</html>
