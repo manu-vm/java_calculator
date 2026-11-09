@@ -7,50 +7,40 @@
 <meta name="description" content="A simple, responsive Java calculator for everyday arithmetic.">
 <title>Java Calculator</title>
 <style>
-:root{color-scheme:dark;--bg:#101915;--panel:#19251f;--screen:#121b17;--key:#26352d;--key-hover:#30443a;--accent:#b8f36b;--text:#f4f7f3;--muted:#94a59a;--border:#304137}
+:root{color-scheme:light;--bg:#dedede;--panel:#f4f4f4;--screen:#d3d3d3;--key:#efefef;--text:#111;--muted:#555;--border:#888;--blue:#2457a7}
 *{box-sizing:border-box}
-body{margin:0;min-height:100svh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 10%,#26372c 0,transparent 45%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.app{width:min(100%,390px)}
-.brand{display:flex;align-items:center;gap:12px;margin:0 0 18px 3px}
-.brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:var(--accent);color:#1b2715;font-size:21px;font-weight:800}
-h1{font-size:17px;letter-spacing:.01em;margin:0}
-.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}
-.calculator{padding:16px;background:color-mix(in srgb,var(--panel) 94%,transparent);border:1px solid var(--border);border-radius:26px;box-shadow:0 28px 80px #0006}
-.display{height:130px;margin-bottom:14px;padding:16px 18px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;overflow:hidden;border:1px solid #29392f;border-radius:18px;background:var(--screen)}
-.expression{width:100%;min-height:22px;color:var(--muted);font-size:14px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.output{width:100%;margin-top:7px;color:var(--text);font-variant-numeric:tabular-nums;font-size:clamp(34px,10vw,52px);font-weight:550;letter-spacing:-.045em;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip}
-.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-button{height:66px;border:1px solid transparent;border-radius:16px;background:var(--key);color:var(--text);font:600 21px/1 inherit;cursor:pointer;transition:background .14s,transform .08s,border-color .14s;touch-action:manipulation}
-button:hover{background:var(--key-hover);border-color:#405448}
-button:active{transform:scale(.96)}
-button:focus-visible{outline:3px solid #fff;outline-offset:2px}
-button.utility{color:#d6e2d9;background:#304139;font-size:17px}
-button.operator{color:var(--accent);font-size:25px}
-button.equals{background:var(--accent);color:#1b2715;font-size:25px}
-button.equals:hover{background:#c8ff80}
-button.zero{grid-column:span 2;text-align:left;padding-left:26px}
-.hint{margin:15px 4px 0;color:var(--muted);font-size:12px;text-align:center}
-@media(max-width:420px){body{padding:18px}.calculator{padding:13px;border-radius:23px}.keys{gap:8px}button{height:clamp(58px,16vw,66px);border-radius:14px}}
+body{margin:0;min-height:100svh;display:grid;place-items:center;padding:18px;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.app{width:min(460px,calc(100vw - 24px))}
+.calculator{width:100%;height:500px;padding:10px 20px 50px;background:var(--panel);border:1px solid #8c8c8c;box-shadow:0 3px 12px #0002}
+.display{height:80px;margin-bottom:10px;padding:8px 10px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;overflow:hidden;border:1px solid #aaa;background:var(--screen)}
+.expression{width:100%;min-height:16px;color:#555;font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.output{width:100%;margin-top:1px;color:#111;font-variant-numeric:tabular-nums;font-size:40px;font-weight:700;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.keys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(4,80px);gap:10px 4px}
+button{min-width:0;height:80px;border:1px solid #999;border-radius:2px;background:var(--key);color:#111;font:700 46px/1 Arial,Helvetica,sans-serif;cursor:pointer;box-shadow:inset 0 1px #fff;touch-action:manipulation}
+button:hover{background:#e4e4e4;border-color:#777}
+button:active{background:#d7d7d7;box-shadow:inset 0 2px 4px #0003}
+button:focus-visible{outline:3px solid #2457a7;outline-offset:1px}
+button.utility{grid-column:span 2;font-size:16px}
+button.operator{font-size:31px}
+button.equals{grid-column:span 3;background:#e5e5e5;font-size:31px}
+button.equals:hover{background:#d9e4f4}
+.hint{margin:11px 0 0;color:#555;font-size:12px;text-align:center}
+@media(max-width:480px){body{padding:12px}.calculator{height:min(500px,calc(100svh - 62px));min-height:410px;padding:10px 12px 34px}.keys{grid-template-rows:repeat(4,minmax(58px,1fr));gap:8px 4px;height:calc(100% - 90px)}button{height:100%;font-size:clamp(30px,10vw,46px)}button.utility{font-size:15px}.output{font-size:clamp(34px,10vw,40px)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <main class="app">
-  <header class="brand"><div class="brand-mark" aria-hidden="true">÷</div><div><h1>Java Calculator</h1><p>Simple calculations, wherever you are</p></div></header>
   <section class="calculator" aria-label="Calculator">
     <div class="display" role="status" aria-live="polite" aria-atomic="true">
       <div class="expression" id="expression"></div>
       <output class="output" id="output" aria-label="Display">0</output>
     </div>
     <div class="keys">
-      <button class="utility" data-action="clear" aria-label="All clear">AC</button>
-      <button class="utility" data-action="sign" aria-label="Change sign">+/−</button>
-      <button class="utility" data-action="percent" aria-label="Percent">%</button>
-      <button class="operator" data-op="/" aria-label="Divide">÷</button>
-      <button data-digit="7">7</button><button data-digit="8">8</button><button data-digit="9">9</button><button class="operator" data-op="*" aria-label="Multiply">×</button>
-      <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button><button class="operator" data-op="-" aria-label="Subtract">−</button>
-      <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button><button class="operator" data-op="+" aria-label="Add">+</button>
-      <button class="zero" data-digit="0">0</button><button data-digit=".">.</button><button class="equals" data-action="equals" aria-label="Equals">=</button>
+      <button data-digit="7">7</button><button data-digit="8">8</button><button data-digit="9">9</button><button class="utility" data-action="clear" aria-label="Clear">Clear</button>
+      <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button><button class="operator" data-op="+" aria-label="Add">+</button><button class="operator" data-op="*" aria-label="Multiply">×</button>
+      <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button><button class="operator" data-op="-" aria-label="Subtract">−</button><button class="operator" data-op="/" aria-label="Divide">÷</button>
+      <button data-digit="0">0</button><button data-digit=".">.</button><button class="equals" data-action="equals" aria-label="Equals">=</button>
     </div>
   </section>
   <p class="hint">Use the buttons or your keyboard · Esc clears · Enter calculates</p>
